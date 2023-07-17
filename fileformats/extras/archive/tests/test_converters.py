@@ -3,6 +3,7 @@ import pytest
 from fileformats.generic import File, Directory
 from fileformats.archive import Zip, Gzip, Tar, TarGzip
 from fileformats.text import Plain as PlainText
+import fileformats.extras.archive  # noqa
 
 
 TEST_DIR = "__test_dir__"
