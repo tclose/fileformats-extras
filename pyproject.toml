@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fileformats-archive-extras"
+name = "fileformats-extras"
 description = "Classes for representing different file formats in Python classes for use in type hinting in data workflows"
 readme = "README.rst"
 requires-python = ">=3.8"
@@ -57,20 +57,20 @@ test = [
 ]
 
 [project.urls]
-repository = "https://github.com/ArcanaFramework/fileformats-archive-extras"
+repository = "https://github.com/ArcanaFramework/fileformats-extras"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "fileformats/extras/archive/_version.py"
+version-file = "fileformats/extras/core/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["fileformats"]
 
 [tool.black]
 target-version = ['py38']
-exclude = "fileformats/extras/archive/_version.py"
+exclude = "fileformats/extras/core/_version.py"
 
 [tool.codespell]
 ignore-words = ".codespell-ignorewords"
