@@ -13,7 +13,7 @@ FileFormats Extras
 
 
 This is a extras module for the
-[fileformats](https://github.com/ArcanaFramework/fileformats) package, which provides
+`fileformats <https://github.com/ArcanaFramework/fileformats>`__ package, which provides
 additional functionality to format classes (i.e. aside from basic identification and validation), such as
 conversion tools, metadata parsers, test data generators, etc...
 
