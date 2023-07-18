@@ -1,5 +1,4 @@
 from fileformats.serialization import Json, Yaml
-import fileformats.extras.serialization  # noqa
 
 
 SAMPLE_JSON = """{

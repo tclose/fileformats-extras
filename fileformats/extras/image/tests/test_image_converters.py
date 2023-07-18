@@ -1,7 +1,6 @@
 import pytest
 from imageio.core.fetching import get_remote_file
 from fileformats.image import Bitmap, Gif, Jpeg, Png, Tiff
-import fileformats.extras.image  # noqa
 
 
 @pytest.fixture(scope="session")

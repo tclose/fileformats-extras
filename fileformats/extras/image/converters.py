@@ -17,7 +17,7 @@ from fileformats.image.raster import RasterImage, Bitmap, Gif, Jpeg, Png, Tiff
 def convert_image(
     in_file: RasterImage, output_format: ty.Type[RasterImage], out_dir: ty.Optional[Path] = None
 ):
-    data_array = in_file.load()
+    data_array = in_file.read_data()
     if out_dir is None:
         out_dir = Path(tempfile.mkdtemp())
     output_path = out_dir / (in_file.fspath.stem + output_format.ext)
