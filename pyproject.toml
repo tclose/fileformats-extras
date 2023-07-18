@@ -8,7 +8,7 @@ description = "Classes for representing different file formats in Python classes
 readme = "README.rst"
 requires-python = ">=3.8"
 dependencies = [
-    "fileformats >= 0.6",
+    "fileformats",
     "imageio >=2.24.0",
     "pydra >= 0.22.0",
     "PyYAML>=6.0",
