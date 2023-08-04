@@ -56,7 +56,7 @@ Compressed = FileSet.type_var("Compressed")
 @pydra.mark.task
 @pydra.mark.annotate(
     {
-        "return": {"out_file": ty.Union[Tar, TarGzip]},
+        "return": {"out_file": Path},
     }
 )
 def create_tar(
@@ -68,7 +68,7 @@ def create_tar(
     format: int = tarfile.DEFAULT_FORMAT,
     ignore_zeros: bool = False,
     encoding: str = tarfile.ENCODING,
-) -> ty.Union[Tar, TarGzip]:
+) -> Path:
 
     if len(in_file.fspaths) > 1:
         raise NotImplementedError("Can only archive file-sets with single paths currently")
