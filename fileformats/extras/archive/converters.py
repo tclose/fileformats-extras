@@ -46,8 +46,6 @@ ZIP_COMPRESSION_ANNOT = (
 
 Compressed = FileSet.type_var("Compressed")
 
-PathLike = ty.Union[str, bytes, os.PathLike]
-
 
 @mark.converter(source_format=FsObject, target_format=Tar)
 @mark.converter(source_format=FsObject, target_format=TarGzip, compression="gz")
@@ -58,77 +56,22 @@ PathLike = ty.Union[str, bytes, os.PathLike]
 @pydra.mark.task
 @pydra.mark.annotate(
     {
-        "return": {"out_file": Path},
+        "return": {"out_file": ty.Union[Tar, TarGzip]},
     }
 )
 def create_tar(
-    in_file: FileSet,
+    in_file: FsObject,
     out_file: ty.Optional[Path] = None,
     base_dir: ty.Optional[Path] = None,
-    filter: ty.Optional[str] = None,
+    filter: ty.Optional[ty.Callable] = None,
     compression: ty.Optional[str] = None,
     format: int = tarfile.DEFAULT_FORMAT,
     ignore_zeros: bool = False,
     encoding: str = tarfile.ENCODING,
-) -> Path:
-    return _create_tar(
-        in_file=in_file,
-        out_file=out_file,
-        base_dir=base_dir,
-        filter=filter,
-        compression=compression,
-        format=format,
-        ignore_zeros=ignore_zeros,
-        encoding=encoding,
-    )
+) -> ty.Union[Tar, TarGzip]:
 
-
-# @mark.converter(source_format=Directory, target_format=Tar_Gzip, compression="gz")
-# @mark.converter(source_format=Directory, target_format=Tar)
-# @pydra.mark.task
-# @pydra.mark.annotate(
-#     {
-#         "in_file": pydra.engine.specs.Directory,
-#         "out_file": str,
-#         "filter": str,
-#         "compression": str,  # TAR_COMPRESSION_ANNOT,
-#         "format": int,
-#         "ignore_zeros": bool,
-#         "return": {"out_file": Path},
-#     }
-# )
-# def tar_dir(
-#     in_file,
-#     out_file=None,
-#     base_dir=None,
-#     filter=None,
-#     compression=None,
-#     format=tarfile.DEFAULT_FORMAT,
-#     ignore_zeros=False,
-#     encoding=tarfile.ENCODING,
-# ):
-#     return _create_tar(
-#         in_file=in_file,
-#         out_file=out_file,
-#         base_dir=base_dir,
-#         filter=filter,
-#         compression=compression,
-#         format=format,
-#         ignore_zeros=ignore_zeros,
-#         encoding=encoding,
-#     )
-
-
-def _create_tar(
-    in_file,
-    out_file=None,
-    base_dir=None,
-    filter=None,
-    compression=None,
-    format=tarfile.DEFAULT_FORMAT,
-    ignore_zeros=False,
-    encoding=tarfile.ENCODING,
-):
+    if len(in_file.fspaths) > 1:
+        raise NotImplementedError("Can only archive file-sets with single paths currently")
 
     if not compression:
         compression = ""
@@ -137,12 +80,12 @@ def _create_tar(
         ext = ".tar." + compression
 
     if not out_file:
-        out_file = Path(in_file).name + ext
+        out_file = Path(Path(in_file).name + ext)
 
     if base_dir is None:
         base_dir = Path(in_file).parent
 
-    out_file = os.path.abspath(out_file)
+    out_file = out_file.absolute()
 
     with tarfile.open(
         out_file,
@@ -162,18 +105,18 @@ def _create_tar(
 @mark.converter(source_format=Tar[Compressed], target_format=Compressed)
 @mark.converter(source_format=TarGzip[Compressed], target_format=Compressed)
 @pydra.mark.task
-@pydra.mark.annotate({"return": {"out_file": pydra.engine.specs.MultiOutputObj}})
+@pydra.mark.annotate({"return": {"out_file": Path}})
 def extract_tar(
-    in_file: FileSet,
+    in_file: FsObject,
     extract_dir: Path,
     bufsize: int = 10240,
-    compression_type: str = "*",
-) -> ty.Iterable[Path]:
+    compression_type: str = "*"
+) -> Path:
 
     if extract_dir == attrs.NOTHING:
-        extract_dir = tempfile.mkdtemp()
+        extract_dir = Path(tempfile.mkdtemp())
     else:
-        extract_dir = os.path.abspath(extract_dir)
+        extract_dir = extract_dir.absolute()
         os.makedirs(extract_dir, exist_ok=True)
     extract_dir = Path(extract_dir)
 
@@ -183,7 +126,10 @@ def extract_tar(
     with tarfile.open(in_file, mode=f"r:{compression_type}") as tfile:
         tfile.extractall(path=extract_dir)
 
-    return [extract_dir / f for f in os.listdir(extract_dir)]
+    extracted = [extract_dir / f for f in os.listdir(extract_dir)]
+    if len(extracted) > 1:
+        raise NotImplementedError("Can't handle zip files with more than one path currently")
+    return extracted[0]
 
 
 @mark.converter(source_format=FsObject, target_format=Zip)
@@ -191,77 +137,29 @@ def extract_tar(
 @pydra.mark.task
 @pydra.mark.annotate(
     {
-        "return": {"out_file": PathLike},
+        "return": {"out_file": Zip},
     }
 )
 def create_zip(
-    in_file: FileSet,
+    in_file: FsObject,
     out_file: Path,
     base_dir: Path,
     compression: int = zipfile.ZIP_DEFLATED,
     allowZip64: bool = True,
     compresslevel: ty.Optional[int] = None,
     strict_timestamps: bool = True,
-):
-    return _create_zip(
-        in_file=in_file,
-        out_file=out_file,
-        base_dir=base_dir,
-        compression=compression,
-        allowZip64=allowZip64,
-        compresslevel=compresslevel,
-        strict_timestamps=strict_timestamps,
-    )
+) -> Zip:
 
-
-# @mark.converter(source_format=Directory, target_format=Zip)
-# @pydra.mark.task
-# @pydra.mark.annotate(
-#     {
-#         "in_file": pydra.engine.specs.Directory,
-#         "out_file": str,
-#         "compression": int,  # ZIP_COMPRESSION_ANNOT,
-#         "allowZip64": bool,
-#         "return": {"out_file": Path},
-#     }
-# )
-# def zip_dir(
-#     in_file,
-#     out_file,
-#     base_dir,
-#     compression=zipfile.ZIP_DEFLATED,
-#     allowZip64=True,
-#     compresslevel=None,
-#     strict_timestamps=True,
-# ):
-#     return _create_zip(
-#         in_file=in_file,
-#         out_file=out_file,
-#         base_dir=base_dir,
-#         compression=compression,
-#         allowZip64=allowZip64,
-#         compresslevel=compresslevel,
-#         strict_timestamps=strict_timestamps,
-#     )
-
-
-def _create_zip(
-    in_file,
-    out_file,
-    base_dir,
-    compression=zipfile.ZIP_DEFLATED,
-    allowZip64=True,
-    compresslevel=None,
-    strict_timestamps=True,
-):
+    if len(in_file.fspaths) > 1:
+        raise NotImplementedError("Can only archive file-sets with single paths currently")
 
     if out_file == attrs.NOTHING:
-        out_file = Path(in_file).name + ".zip"
+        out_file = Path(Path(in_file).name + ".zip")
 
     if base_dir == attrs.NOTHING:
         base_dir = Path(in_file).parent
 
-    out_file = os.path.abspath(out_file)
+    out_file = out_file.absolute()
 
     zip_kwargs = {}
     if not strict_timestamps:  # Truthy is the default in earlier versions
@@ -297,20 +195,26 @@ def _create_zip(
 @mark.converter(source_format=Zip, target_format=FsObject)
 @mark.converter(source_format=Zip[Compressed], target_format=Compressed)
 @pydra.mark.task
-@pydra.mark.annotate({"return": {"out_file": pydra.engine.specs.MultiOutputObj}})
-def extract_zip(in_file: PathLike, extract_dir: PathLike):
+@pydra.mark.annotate({"return": {"out_file": Path}})
+def extract_zip(
+    in_file: Zip,
+    extract_dir: Path
+) -> Path:
 
     if extract_dir == attrs.NOTHING:
-        extract_dir = tempfile.mkdtemp()
+        extract_dir = Path(tempfile.mkdtemp())
     else:
-        extract_dir = os.path.abspath(extract_dir)
+        extract_dir = extract_dir.absolute()
         os.makedirs(extract_dir, exist_ok=True)
     extract_dir = Path(extract_dir)
 
     with zipfile.ZipFile(in_file) as zfile:
         zfile.extractall(path=extract_dir)
 
-    return [extract_dir / f for f in os.listdir(extract_dir)]
+    extracted = [extract_dir / f for f in os.listdir(extract_dir)]
+    if len(extracted) > 1:
+        raise NotImplementedError("Can't handle zip files with more than one path currently")
+    return extracted[0]
 
 
 def relative_path(path, base_dir):
