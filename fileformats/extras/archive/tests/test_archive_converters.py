@@ -1,7 +1,7 @@
 import filecmp
 import pytest
 from fileformats.generic import File, Directory
-from fileformats.archive import Zip, Gzip, Tar, TarGzip
+from fileformats.application import Zip, Gzip, Tar, TarGzip
 from fileformats.text import Plain as PlainText
 
 

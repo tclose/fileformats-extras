@@ -11,7 +11,7 @@ import pydra.engine.specs
 from fileformats.generic import FsObject
 from fileformats.core.utils import set_cwd
 from fileformats.core import mark, FileSet
-from fileformats.archive import Zip, Tar, TarGzip
+from fileformats.application import Zip, Tar, TarGzip
 
 
 TAR_COMPRESSION_TYPES = ["", "gz", "bz2", "xz"]
