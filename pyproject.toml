@@ -12,6 +12,7 @@ dependencies = [
     "imageio >=2.24.0",
     "pydra >= 0.22.0",
     "PyYAML>=6.0",
+    "pydicom >=2.3",
 ]
 license = {file = "LICENSE"}
 authors = [
