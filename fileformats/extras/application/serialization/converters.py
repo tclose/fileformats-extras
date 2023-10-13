@@ -4,7 +4,7 @@ import tempfile
 import pydra.mark
 import pydra.engine.specs
 from fileformats.core import mark
-from fileformats.serialization import DataSerialization, Json, Yaml
+from fileformats.application import DataSerialization, Json, Yaml
 
 
 @mark.converter(target_format=Json, output_format=Json)

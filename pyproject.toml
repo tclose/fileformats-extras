@@ -12,6 +12,7 @@ dependencies = [
     "imageio >=2.24.0",
     "pydra >= 0.22.0",
     "PyYAML>=6.0",
+    "pydicom >=2.3",
 ]
 license = {file = "LICENSE"}
 authors = [
@@ -54,6 +55,7 @@ test = [
     "pytest-env>=0.6.2",
     "pytest-cov>=2.12.1",
     "codecov",
+    "medimages4tests",
 ]
 
 [project.urls]

@@ -1,4 +1,4 @@
-from fileformats.serialization import Json, Yaml
+from fileformats.application import Json, Yaml
 
 
 SAMPLE_JSON = """{

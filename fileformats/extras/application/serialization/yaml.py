@@ -1,5 +1,5 @@
 import yaml
-from fileformats.serialization import DataSerialization, Yaml
+from fileformats.application import DataSerialization, Yaml
 
 
 @DataSerialization.load.register
