@@ -1,6 +1,7 @@
 from pathlib import Path
 import typing as ty
 import tempfile
+import yaml
 import pydra.mark
 import pydra.engine.specs
 from fileformats.core import mark
@@ -19,3 +20,16 @@ def convert_data_serialization(
         out_dir = Path(tempfile.mkdtemp())
     output_path = out_dir / (in_file.fspath.stem + output_format.ext)
     return output_format.save_new(output_path, dct)
+
+
+@DataSerialization.load.register
+def yaml_load(yml: Yaml):
+    with open(yml.fspath) as f:
+        data = yaml.load(f, Loader=yaml.Loader)
+    return data
+
+
+@DataSerialization.save.register
+def yaml_save(yml: Yaml, data):
+    with open(yml.fspath, "w") as f:
+        yaml.dump(data, f)

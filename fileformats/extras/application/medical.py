@@ -20,7 +20,7 @@ def dicom_read_metadata(dicom: Dicom, specific_tags=None) -> ty.Mapping[str, ty.
 
 
 @FileSet.generate_sample_data.register
-def dicom_dir_generate_sample_data(
+def dicom_generate_sample_data(
     dicom: Dicom, dest_dir: Path, seed: ty.Union[int, Random], stem: ty.Optional[str]
 ):
     return next(
